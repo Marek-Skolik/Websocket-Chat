@@ -7,28 +7,20 @@ const messageContentInput = document.getElementById('message-content');
 
 let userName = '';
 
+const socket = io();
+
+socket.on('message', ({ author, content }) => addMessage(author, content));
+
 const login = (e) => {
   e.preventDefault();
-  if (!userNameInput.value) {
-    alert('User Name must not be empty');
-  } else {
+  if (userNameInput.value.length > 0) {
     userName = userNameInput.value;
-    loginForm.classList.remove('show');
-    messagesSection.classList.add('show');
-  }
-};
-
-const sendMessage = (e) => {
-  e.preventDefault();
-  if (!messageContentInput.value) {
-    alert('You must write the message');
+    loginForm.classList.remove("show");
+    messagesSection.classList.add("show");
+    addMessageForm.classList.add("show");
+    socket.emit("join", userName);
   } else {
-    addMessage(userName, messageContentInput.value);
-    socket.emit('message', {
-      author: userName,
-      content: messageContentInput.value,
-    });
-    messageContentInput.value = '';
+    alert("Please enter a username");
   }
 };
 
@@ -45,6 +37,22 @@ function addMessage(author, content) {
   `;
   messagesList.appendChild(message);
 };
+
+function sendMessage(e) {
+  e.preventDefault();
+
+  let messageContent = messageContentInput.value;
+
+  if(!messageContent.length) {
+    alert('You have to type something!');
+  }
+  else {
+    addMessage(userName, messageContent);
+    socket.emit('message', { author: userName, content: messageContent })
+    messageContentInput.value = '';
+  }
+
+}
 
 loginForm.addEventListener('submit', login);
 addMessageForm.addEventListener('submit', sendMessage);
