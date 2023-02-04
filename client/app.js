@@ -13,9 +13,22 @@ const login = (e) => {
     alert('User Name must not be empty');
   } else {
     userName = userNameInput.value;
-    socket.emit('userName', userName);
     loginForm.classList.remove('show');
     messagesSection.classList.add('show');
+  }
+};
+
+const sendMessage = (e) => {
+  e.preventDefault();
+  if (!messageContentInput.value) {
+    alert('You must write the message');
+  } else {
+    addMessage(userName, messageContentInput.value);
+    socket.emit('message', {
+      author: userName,
+      content: messageContentInput.value,
+    });
+    messageContentInput.value = '';
   }
 };
 
@@ -31,7 +44,7 @@ function addMessage(author, content) {
     </div>
   `;
   messagesList.appendChild(message);
-}
+};
 
 loginForm.addEventListener('submit', login);
 addMessageForm.addEventListener('submit', sendMessage);
